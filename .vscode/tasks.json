@@ -1,0 +1,82 @@
+{
+    "version": "2.0.0",
+    "tasks": [        {            
+            "label": "Run Tests",
+            "type": "shell",
+            "command": "uv run pytest",
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true,
+                "focus": true
+            },
+            "problemMatcher": []
+        },        {
+            "label": "Run Linter (Ruff Check)",
+            "type": "shell",
+            "command": "ruff check",
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true,
+                "focus": true
+            },
+            "problemMatcher": []
+        },        {
+            "label": "Pre-commit Check (Tests + Lint)",
+            "dependsOrder": "sequence",
+            "dependsOn": [ "Run Tests", "Run Linter (Ruff Check)"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Verity",
+            "type": "shell",
+            "command": "uv run verity.py",
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true,
+                "focus": true
+            },            "problemMatcher": []
+        },
+        {
+            "label": "UV Sync ",
+            "type": "shell",
+            "command": "uv sync",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true,
+                "focus": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

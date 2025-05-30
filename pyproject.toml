@@ -7,6 +7,8 @@ requires-python = ">=3.13"
 dependencies = [
     "flask>=3.1.0",
     "pytest>=8.3.5",
+    "python-lsp-ruff>=2.2.2",
+    "python-lsp-server>=1.12.2",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
     "ruff>=0.11.9",
@@ -16,4 +18,25 @@ pythonpath = ["."]
 testspaths = ["tests"]
 python_files = "test_*.py"
 python_functions = "test_*"
+
+[tool.pylsp]
+plugins.ruff.enabled = true
+plugins.ruff.format = ["I"]  # Use ruff to organize imports
+plugins.ruff.lineLength = 100
+plugins.rope_completion.enabled = true
+plugins.rope_autoimport.enabled = true
+plugins.jedi_completion.enabled = true
+plugins.jedi_definition.enabled = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]  # Error, F: PyFlakes, I: isort, W: pycodestyle warnings
+ignore = []
+
+# Also organize imports
+[tool.ruff.lint.isort]
+known-first-party = ["verity"]
 

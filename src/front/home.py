@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template
-from flask import flash, redirect, url_for, session, request
 import logging
+
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
 import data_handler
 from config import VerityConfig

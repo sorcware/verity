@@ -1,6 +1,8 @@
-from src import config
 import os
+
 import yaml
+
+from src import config
 
 
 def test_verity_config_default_secret_key(monkeypatch):

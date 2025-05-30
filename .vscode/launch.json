@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [        {
+            "name": "Debug Verity",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/verity.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/src",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "preLaunchTask": "UV Sync "
+        }
+    ]
+}

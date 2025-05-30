@@ -1,7 +1,7 @@
-import os
+import atexit
 import logging
 import logging.config
-import atexit
+import os
 
 from flask import Flask
 
