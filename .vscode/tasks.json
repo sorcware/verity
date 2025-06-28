@@ -61,13 +61,28 @@
                 "clear": true,
                 "focus": true
             },            "problemMatcher": []
-        },
-        {
+        },        {
             "label": "UV Sync ",
             "type": "shell",
             "command": "uv sync",
             "options": {
                 "cwd": "${workspaceFolder}"
+            },
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true,
+                "focus": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Fix Code with Ruff",
+            "type": "shell",
+            "command": "ruff check --fix .",
+            "options": {
+                "cwd": "${workspaceFolder}/src"
             },
             "group": "none",
             "presentation": {

@@ -10,6 +10,7 @@ class VerityConfig:
         self.CONFIG_FILE_DIRECTORY = "config_files"
         self.LOGGING_CONFIG = self.load_config_file("logging_config.yaml")
         self.DATABASE_SCHEMA = self.load_config_file("verity_schema.yaml")
+        self.DEFAULT_DATA = self.load_config_file("default_data.yaml")
 
     def load_config_file(self, file):
         config = ""

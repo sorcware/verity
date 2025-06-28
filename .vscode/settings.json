@@ -17,4 +17,5 @@
     "editor.defaultFormatter": "charliermarsh.ruff",
     "ruff.enable": true,
     "ruff.organizeImports": true,
+    "editor.renderWhitespace": "all", 
 }

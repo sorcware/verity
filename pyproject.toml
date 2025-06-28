@@ -31,6 +31,7 @@ plugins.jedi_definition.enabled = true
 [tool.ruff]
 line-length = 100
 target-version = "py313"
+fix = true
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]  # Error, F: PyFlakes, I: isort, W: pycodestyle warnings
