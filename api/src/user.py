@@ -3,6 +3,14 @@ from typing import List
 
 from api.src.category import Category
 from api.src.data_handler import Database
+from api.src.account import (
+    Account,
+    currentAccount,
+    cashAccount,
+    savingAccount,
+    creditAccount,
+    untrackedAccount,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -14,8 +22,9 @@ class User:
         self.database: Database = database
         self.name: str = user_name
         self.id: int = id
-        self.categories: List = []
+        self.categories: List[Category] = []
         self.internal_category_id = 0
+        self.accounts: list[Account] = []
         logger.info(f"{self.name} initialised.")
 
     def __str__(self):
