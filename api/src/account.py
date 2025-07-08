@@ -2,7 +2,6 @@
 
 import logging
 
-from api.src.user import User  # probably the other way round
 from api.src.data_handler import Database
 
 logger = logging.getLogger(__name__)
@@ -48,18 +47,38 @@ class Account:
 class currentAccount(Account):
     "Current Bank Account for every day banking"
 
+    def __init__(self, database, name, id):
+        self.type = "Current"
+        super(currentAccount, self).__init__(database, name, id)
+
 
 class cashAccount(Account):
     "Cash Account for tracking your real money"
+
+    def __init__(self, database, name, id):
+        self.type = "Cash"
+        super(currentAccount, self).__init__(database, name, id)
 
 
 class savingAccount(Account):
     "Saving Account for tracking your savings"
 
+    def __init__(self, database, name, id):
+        self.type = "Saving"
+        super(currentAccount, self).__init__(database, name, id)
+
 
 class creditAccount(Account):
     "Credit Acount, for tracking your debts like credit cards"
 
+    def __init__(self, database, name, id):
+        self.type = "Credit"
+        super(currentAccount, self).__init__(database, name, id)
+
 
 class untrackedAccount(Account):
     "for money you still want to see, but dont use as part of your budget."
+
+    def __init__(self, database, name, id):
+        self.type = "Untracked"
+        super(currentAccount, self).__init__(database, name, id)
