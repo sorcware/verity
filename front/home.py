@@ -2,30 +2,37 @@ import logging
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
-import currency_handler
-import data_handler
-from config import VerityConfig
+from api.src.category import Category
+from api.src.config import VerityConfig
+from api.src.currency_handler import CurrencyBrain
+from api.src.data_handler import Database
+from api.src.user import User
 
 logger = logging.getLogger(__name__)
 
 home_bp = Blueprint("home", __name__, template_folder="templates")
-verity_config = VerityConfig()
+# verity_config = VerityConfig()
 
 
 @home_bp.route("/")
 def home_page():
     logger.info("home page hit")
-    db_call = data_handler.database(verity_config)
+    db_call = Database(VerityConfig())
     users = db_call.get_users()
     # Get user info directly from session
     user_id = session.get("user_id")
     selected_user_name = session.get("user_name")
-
     # Debug log to see what's being passed to the template
     logger.debug(f"User ID from session: {user_id}, User Name from session: {selected_user_name}")
     logger.info(f"{selected_user_name} is logged in")
-
-    categories = db_call.get_categories(user_id) if user_id else []
+    verity_user = User(db_call, selected_user_name, user_id)
+    logger.info(f"user: {verity_user}")
+    if not verity_user:
+        categories = []
+    else:
+        categories = verity_user.get_categories()
+        for category in categories:
+            category.get_children()
     return render_template(
         "home.html",
         users=users,
@@ -43,15 +50,13 @@ def submit_user_name():
         flash("Please enter a user name.", "danger")
         return redirect(url_for("home.home_page"))
 
-    db_call = data_handler.database(verity_config)
-    # More efficient check for existing user
-    exists = db_call.read_database("SELECT 1 FROM user WHERE name = ?", (user_name,))
-    if exists:
-        logger.warning(f"username already exists in the database: {user_name}")
+    verity_user = User(Database(VerityConfig()), user_name)
+    logger.info(f"does user '{user_name}' exist?")
+    if verity_user.exists():
         flash("A user with that name already exists.", "danger")
         return redirect(url_for("home.home_page"))
     logger.info(f"User submitted new user name: {user_name}")
-    user_id = db_call.add_user_name(user_name)
+    user_id = verity_user.add()
     if user_id == 0:
         flash("User Name not saved, please check the logs", "danger")
         return redirect(url_for("home.home_page"))
@@ -79,13 +84,14 @@ def select_user():
         return redirect(url_for("home.home_page"))
 
     # Get the user details directly from the database using the ID
-    db_call = data_handler.database(verity_config)
-    result = db_call.read_database("SELECT name FROM user WHERE id = ?", (selected_user_id,))
+    database = Database(VerityConfig())
+    verity_user = User(database, id=selected_user_id)
+    verity_user.get()
 
-    if result and result[0]:
+    if verity_user.name and verity_user.id:
         # Store both ID and name in the session
         session["user_id"] = selected_user_id
-        session["user_name"] = result[0][0]
+        session["user_name"] = verity_user.name
         flash("User selected!", "success")
     else:
         session.pop("user_id", None)
@@ -119,15 +125,32 @@ def submit_category():
             logger.info("user is stupid and tried to assign a negative amount to the category")
             flash("Negative amounts don`t really make sense here, removed budget amount", "danger")
             budget_value_input = 0
-        budget_value = currency_handler.convert_to_universal_currency(budget_value_input)
+        budget_value = CurrencyBrain.convert_to_universal_currency(budget_value_input)
     # Convert parent_id to int if provided
     parent_id = request.form.get("parentId", "0").strip()
-
-    db_call = data_handler.database(verity_config)
-    if parent_id == 0:
-        category_id = db_call.add_category(user_id, category_name, budget_value)
+    database = Database(VerityConfig())
+    logger.debug(f"parent_id for new category is {parent_id}")
+    if int(parent_id) == int(0):
+        logger.info("user submited category with no parent, class should get default category")
+        new_category = Category(
+            database=database,
+            user_id=user_id,
+            category_name=category_name,
+            budget_value=budget_value,
+        )
     else:
-        category_id = db_call.add_category(user_id, category_name, budget_value, parent_id)
+        logger.info("user submited category with parent, class should use that id")
+        parent_category = Category(database=database, user_id=user_id, id=parent_id)
+        new_category = Category(
+            database=database,
+            user_id=user_id,
+            category_name=category_name,
+            budget_value=budget_value,
+            parent=parent_category,
+        )
+    logger.info(repr(new_category))
+    category_id = new_category.add()
+    logger.info(repr(new_category))
     if category_id == 0:
         flash("Category not saved, please check the logs", "danger")
     else:

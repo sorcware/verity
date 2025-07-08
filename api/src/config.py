@@ -6,11 +6,10 @@ import yaml
 class VerityConfig:
     def __init__(self):
         self.SECRET_KEY = os.environ.get("SECRET_KEY") or "super_secret_key"
-        self.DATABASE = "Verity.db"
-        self.CONFIG_FILE_DIRECTORY = "config_files"
+        self.DATABASE = "api/data/verity.db"
+        self.CONFIG_FILE_DIRECTORY = "api/config_files"
         self.LOGGING_CONFIG = self.load_config_file("logging_config.yaml")
         self.DATABASE_SCHEMA = self.load_config_file("verity_schema.yaml")
-        self.DEFAULT_DATA = self.load_config_file("default_data.yaml")
 
     def load_config_file(self, file):
         config = ""

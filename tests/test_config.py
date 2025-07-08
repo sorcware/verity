@@ -2,7 +2,7 @@ import os
 
 import yaml
 
-from src import config
+from api.src import config
 
 
 def test_verity_config_default_secret_key(monkeypatch):
@@ -23,13 +23,13 @@ def test_verity_config_secret_key_from_env(monkeypatch):
 def test_verity_config_database_name(monkeypatch):
     """Test that the database name is correctly set."""
     testing_config = config.VerityConfig()
-    assert testing_config.DATABASE == "Verity.db"
+    assert testing_config.DATABASE == "api/data/verity.db"
 
 
 def test_verity_config_config_file_directory(monkeypatch):
     """Test that the config file directory is set."""
     testing_config = config.VerityConfig()
-    assert testing_config.CONFIG_FILE_DIRECTORY == "config_files"
+    assert testing_config.CONFIG_FILE_DIRECTORY == "api/config_files"
 
 
 def test_verity_config_load_config_file(monkeypatch):

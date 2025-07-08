@@ -4,7 +4,7 @@ import sqlite3
 logger = logging.getLogger(__name__)
 
 
-class database:
+class Database:
     """basic Database class to start some development
     Will need a proper refactor once basic functions are in and working
     This is POC
@@ -14,9 +14,8 @@ class database:
         self.verity_config = config
         self.schema = self.verity_config.DATABASE_SCHEMA
         self.database = self.verity_config.DATABASE
-        self.default_data = self.verity_config.DEFAULT_DATA
 
-    def execute_sql(
+    def execute(
         self, sql_statement: str, params: tuple = (), return_id: bool = False, seed: bool = False
     ) -> (bool, int):
         "send the query here, returns true if successful, false if fail"
@@ -49,13 +48,15 @@ class database:
             connection.close()
             logger.info("closed connection to database")
             if return_id:
+                logger.debug(f"Returning tuple (success), (new id) ({is_success},{new_id})")
                 return (is_success, new_id)
             else:
+                logger.debug(f"Returning success value {is_success}")
                 return is_success
 
-    def read_database(self, sql_statement: str, params: tuple = ()) -> list:
+    def read(self, sql_statement: str, params: tuple = ()) -> list:
         "reads the database query and returns the results"
-        logger.debug(f"received request to read {sql_statement} with params {params}")
+        logger.info(f"received request to read {sql_statement} with params {params}")
         results = []
         try:
             connection = sqlite3.connect(self.database)
@@ -151,53 +152,7 @@ class database:
             except Exception as e:
                 logger.error(e)
 
-    def add_user_name(self, user_name: str) -> int:
-        "takes user name string, returns user id"
-        logger.debug(f"attempting to insert values into user table {user_name}")
-        sql_statement = """
-        INSERT INTO user (name)
-        VALUES (?)
-        """
-        params = (user_name,)
-        success, user_id = self.execute_sql(sql_statement, params, True)
-        if not success:
-            logger.error("Failed to execute sql, check the logs")
-        self.add_category(user_id, "internal_master_category", seed=True)
-        return user_id
-
     def get_users(self) -> list:
         """Returns all users in the database."""
         get_user_sql = "SELECT id, name FROM user"
-        return self.read_database(get_user_sql)
-
-    def add_category(
-        self, user_id: int, category_name: str, budget_value: int = 0, parent_id=None, seed=False
-    ) -> int:
-        """Inserts a new category. Returns the category id."""
-        logger.debug(f"attempting to insert category '{category_name}' for user {user_id}")
-        sql_statement = """
-        INSERT INTO category (user_id, name, budget_value, parent_id)
-        VALUES (?, ?, ?, ?)"""
-        if not seed:
-            if not parent_id:
-                parent_id = self.read_database(
-                    "SELECT id FROM category WHERE user_id = ? AND name = ?",
-                    (user_id, "internal_master_category"),
-                )
-                try:
-                    parent_id = parent_id[0][0]
-                except IndexError:
-                    parent_id = None
-        params = (user_id, category_name, budget_value, parent_id)
-
-        success, category_id = self.execute_sql(sql_statement, params, True, seed)
-        if not success:
-            logger.error("Failed to execute sql, check the logs")
-        return category_id
-
-    def get_categories(self, user_id: int) -> list:
-        """Returns all categories for a given user."""
-        sql = (
-            "SELECT id, name, budget_value, parent_id FROM category WHERE user_id = ? and name != ?"
-        )
-        return self.read_database(sql_statement=sql, params=(user_id, "internal_master_category"))
+        return self.read(get_user_sql)

@@ -41,9 +41,9 @@
         <input type="text" name="categoryName" placeholder="Enter Category Name Here" required />
         <input type="number" step="0.01" name="budgetValue" placeholder="Budget Value (optional)" />
         <select name="parentId">
-            <option value="">No Parent (Top Category)</option>
+            <option value="0">No Parent (Top Category)</option>
             {% for category in categories %}
-                <option value="{{ category[0] }}">{{ category[1] }}</option>
+                <option value="{{ category.id }}">{{ category.name }}</option>
             {% endfor %}
         </select>
         <input type="submit" value="Add Category" />
@@ -51,11 +51,13 @@
 </div>
 <div>
     <p>
-    <b>Your Categories:</b><br>
-    {% for category in categories %}
-        - {{ category[1] }}{% if category[3] %} (Sub of ID {{ category[3] }}){% endif %}{% if category[2] %} [Budget: {{ category[2] }}]{% endif %}<br>
-    {% endfor %}
-    </p>
+<b>Your Categories:</b><br></p>
+<ul>{% for category in categories %}
+<li>{{ category.name }}   - Budget: {{ category.budget_value }}</li>
+{% if category.children|length > 0 %}<ul>{% for child in category.children %}
+<li> {{ child.name}}    - Budget: {{ child.budget_value }}</li>
+{% endfor %}</ul>{% endif %}
+{% endfor %}</ul>
 </div>
 {% else %}
 <div class="alert alert-warning" role="alert">

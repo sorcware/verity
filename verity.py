@@ -5,8 +5,8 @@ import os
 
 from flask import Flask
 
-from config import VerityConfig
-from data_handler import database
+from api.src.config import VerityConfig
+from api.src.data_handler import Database
 from front.home import home_bp
 
 
@@ -27,8 +27,8 @@ if __name__ == "__main__":
     logger.info("app starting")
 
     # database initialise
-    verity = database(verity_config)
-    logger.debug(verity_config.DEFAULT_DATA)
+    verity = Database(verity_config)
+    logger.debug(verity_config)
     verity.build_database()
 
     # app initialise
