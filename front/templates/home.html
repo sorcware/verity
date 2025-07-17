@@ -3,6 +3,12 @@
 {% block content %}
 <h1>Home of Verity</h1>
 <div>
+	<h2>link to user docs and user guide</h2>
+<button onclick="window.location.href='http://localhost:3000';">
+      		Docs and User Guide
+	</button>
+</div>
+<div>
     <form action="{{url_for('home.submit_user_name')}}" method="POST">
         <p>Create New User:</p>
         <input

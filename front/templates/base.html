@@ -22,6 +22,7 @@
 
     <body>
         <a href="{{ url_for('home.home_page') }}" class="button"> Home </a>
+	<a href="{{ url_for('home.stop_server') }}" class="button"> Shutdown Server </a>
         {% with messages = get_flashed_messages(with_categories=true) %} {% if
         messages %} {% for category, message in messages %}
         <div

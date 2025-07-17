@@ -1,4 +1,6 @@
 import logging
+import os
+import subprocess
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
@@ -156,3 +158,22 @@ def submit_category():
     else:
         flash("Category saved!", "success")
     return redirect(url_for("home.home_page"))
+
+
+def stop_mdbook():
+    try:
+        process = subprocess.run(["pgrep", "mdbook"], capture_output=True)
+        # process.kill()
+        pid = process.stdout.strip()
+        print(f"aiming to kill pid: {pid}")
+        os.kill(int(pid), 9)
+        logger.info(f"mdbook process stopped with PID: {pid}")
+    except Exception as e:
+        print(f"Error stopping mdbook: {e}")
+
+
+@home_bp.route("/stop")
+def stop_server():
+    stop_mdbook()
+    os.kill(os.getpid(), 9)
+    return "Stopping servers... (check your logs)"
