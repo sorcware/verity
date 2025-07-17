@@ -1,0 +1,10 @@
+[book]
+authors = ["Jake Pullen"]
+language = "en"
+src = "src"
+title = "Verity User Guide"
+
+[output]
+
+[output.html]
+git-repository-url="https://github.com/Jake-Pullen/verity"
