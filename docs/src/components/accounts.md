@@ -13,6 +13,12 @@ The Attributes of the accounts class are:
 - id (int)
     * the id of the account as stored in the database
 
+- Type (String)
+    * The type of account (see children below)
+
+- balance (int)
+    * The amount of currency the account holds
+
 The Methods of the account class are:
 
 - add
