@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class Category:
-    "Main category class, for anything related to the category"
+    "Main category class, for any theoretical storage of currency"
 
     def __init__(
         self,

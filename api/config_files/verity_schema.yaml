@@ -43,6 +43,11 @@ tables:
         is_pk: False
         datatype: TEXT
         nullable: False
+      - column_name: balance
+        is_pk: False
+        is_fk: False
+        datatype: INTEGER
+        nullable: False
 
   - table_name: party
     table_columns:

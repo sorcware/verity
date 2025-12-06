@@ -9,9 +9,14 @@ from api.src.config import VerityConfig
 from api.src.data_handler import Database
 from front.home import home_bp
 
+os.makedirs("./logs", exist_ok=True)
+os.makedirs("./api/data", exist_ok=True)
+if not os.path.exists("./logs/verity.log"):
+    with open("./logs/verity.log", mode="w"):
+        pass  # create empty file, so logging file handler can work
+
 
 def set_up_logging(config):
-    os.makedirs("../logs", exist_ok=True)
     logging.config.dictConfig(config.LOGGING_CONFIG)
     queue_handler = logging.getHandlerByName("queue_handler")
     if queue_handler is not None:
