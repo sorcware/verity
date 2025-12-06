@@ -89,7 +89,8 @@ class Database:
 
     def _add_table_to_db(self, table: dict) -> bool:
         "Creates the table in the verity database, based on the schema yaml"
-        sql = f"""CREATE TABLE IF NOT EXISTS {table["table_name"]} (
+        table_name = table["table_name"]
+        sql = f"""CREATE TABLE IF NOT EXISTS {table_name} (
         """
         columns = []
         for column in table["table_columns"]:
@@ -101,6 +102,28 @@ class Database:
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
             cursor.execute(sql)
+            
+            # Check for missing columns in existing table
+            cursor.execute(f"PRAGMA table_info({table_name})")
+            existing_columns = [row[1] for row in cursor.fetchall()]
+            
+            for column in table["table_columns"]:
+                col_name = column["column_name"]
+                if col_name not in existing_columns:
+                    logger.info(f"Adding missing column {col_name} to table {table_name}")
+                    # Build column definition for ALTER TABLE
+                    # Note: SQLite ALTER TABLE ADD COLUMN has some restrictions (e.g. can't be PRIMARY KEY)
+                    # But for simple columns like 'balance' it works.
+                    # We need to reconstruct the type and constraints.
+                    col_def = self._build_column(column)
+                    # _build_column returns "name type constraints", we just need "ADD COLUMN name type constraints"
+                    alter_sql = f"ALTER TABLE {table_name} ADD COLUMN {col_def}"
+                    try:
+                        cursor.execute(alter_sql)
+                        logger.info(f"Added column {col_name}")
+                    except sqlite3.OperationalError as e:
+                        logger.error(f"Failed to add column {col_name}: {e}")
+
             connection.commit()
             success_status = True
         except sqlite3.ProgrammingError as pe:
@@ -116,11 +139,28 @@ class Database:
                 logger.error(e)
             return success_status
 
+    def seed_static_data(self):
+        """Populates static data tables like account_type"""
+        account_types = [
+            (1, "Current"),
+            (2, "Cash"),
+            (3, "Saving"),
+            (4, "Credit"),
+            (5, "Untracked"),
+        ]
+        for type_id, name in account_types:
+            # Check if exists first to avoid unique constraint errors if re-running
+            check_sql = "SELECT 1 FROM account_type WHERE id = ?"
+            if not self.read(check_sql, (type_id,)):
+                logger.info(f"Seeding account_type {name}")
+                self.execute("INSERT INTO account_type (id, name) VALUES (?, ?)", (type_id, name))
+
     def build_database(self):
         for table in self.schema["tables"]:
             logger.info(f"Checking {table['table_name']}")
             # Add true/false handling here to gracefully handle errors
             self._add_table_to_db(table)
+        self.seed_static_data()
 
     def print_table_schema(self, table_name):
         """

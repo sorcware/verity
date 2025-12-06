@@ -107,3 +107,27 @@ class User:
         except Exception:
             master_id = 0
         self.internal_category_id = master_id
+
+    def get_accounts(self):
+        logger.info(f"Getting Accounts for {self.name}")
+        sql = "SELECT id, name, type_id, balance FROM account WHERE user_id = ?"
+        params = (self.id,)
+        accounts_data = self.database.read(sql, params)
+        self.accounts = []
+        for acc_data in accounts_data:
+            acc_id, name, type_id, balance = acc_data
+            if type_id == 1:
+                acc = currentAccount(self.database, name, acc_id, self.id)
+            elif type_id == 2:
+                acc = cashAccount(self.database, name, acc_id, self.id)
+            elif type_id == 3:
+                acc = savingAccount(self.database, name, acc_id, self.id)
+            elif type_id == 4:
+                acc = creditAccount(self.database, name, acc_id, self.id)
+            elif type_id == 5:
+                acc = untrackedAccount(self.database, name, acc_id, self.id)
+            else:
+                continue
+            acc.balance = balance
+            self.accounts.append(acc)
+        return self.accounts

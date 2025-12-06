@@ -67,43 +67,43 @@ class Account:
 class currentAccount(Account):
     "Current Bank Account for every day banking"
 
-    def __init__(self, database, name, id):
+    def __init__(self, database, name, id, user_id=0):
+        super(currentAccount, self).__init__(database, name, id, user_id)
         self.type = "Current"
         self.type_id = 1
-        super(currentAccount, self).__init__(database, name, id)
 
 
 class cashAccount(Account):
     "Cash Account for tracking your real money"
 
-    def __init__(self, database, name, id):
+    def __init__(self, database, name, id, user_id=0):
+        super(cashAccount, self).__init__(database, name, id, user_id)
         self.type = "Cash"
         self.type_id = 2
-        super(currentAccount, self).__init__(database, name, id)
 
 
 class savingAccount(Account):
     "Saving Account for tracking your savings"
 
-    def __init__(self, database, name, id):
+    def __init__(self, database, name, id, user_id=0):
+        super(savingAccount, self).__init__(database, name, id, user_id)
         self.type = "Saving"
         self.type_id = 3
-        super(currentAccount, self).__init__(database, name, id)
 
 
 class creditAccount(Account):
     "Credit Acount, for tracking your debts like credit cards"
 
-    def __init__(self, database, name, id):
+    def __init__(self, database, name, id, user_id=0):
+        super(creditAccount, self).__init__(database, name, id, user_id)
         self.type = "Credit"
         self.type_id = 4
-        super(currentAccount, self).__init__(database, name, id)
 
 
 class untrackedAccount(Account):
     "for money you still want to see, but dont use as part of your budget."
 
-    def __init__(self, database, name, id):
+    def __init__(self, database, name, id, user_id=0):
+        super(untrackedAccount, self).__init__(database, name, id, user_id)
         self.type = "Untracked"
         self.type_id = 5
-        super(currentAccount, self).__init__(database, name, id)

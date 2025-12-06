@@ -40,6 +40,32 @@
 </div>
 
 {% if selected_user_id %}
+<!-- Account Form -->
+<div>
+    <form action="{{url_for('home.submit_account')}}" method="POST">
+        <p>New Account:</p>
+        <input type="text" name="accountName" placeholder="Enter Account Name Here" required />
+        <input type="number" step="0.01" name="initialBalance" placeholder="Initial Balance (optional)" />
+        <select name="accountType">
+            <option value="1">Current Account</option>
+            <option value="2">Cash Account</option>
+            <option value="3">Saving Account</option>
+            <option value="4">Credit Account</option>
+            <option value="5">Untracked Account</option>
+        </select>
+        <input type="submit" value="Add Account" />
+    </form>
+</div>
+<div>
+    <p><b>Your Accounts:</b><br></p>
+    <ul>
+        {% for account in accounts %}
+        <li>{{ account.name }} ({{ account.type }}) - Balance: {{ account.balance }}</li>
+        {% endfor %}
+    </ul>
+</div>
+<hr>
+
 <!-- Category Form -->
 <div>
     <form action="{{url_for('home.submit_category')}}" method="POST">

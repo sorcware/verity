@@ -9,6 +9,7 @@ from api.src.config import VerityConfig
 from api.src.currency_handler import CurrencyBrain
 from api.src.data_handler import Database
 from api.src.user import User
+from api.src.account import currentAccount, cashAccount, savingAccount, creditAccount, untrackedAccount
 
 logger = logging.getLogger(__name__)
 
@@ -31,14 +32,17 @@ def home_page():
     logger.info(f"user: {verity_user}")
     if not verity_user:
         categories = []
+        accounts = []
     else:
         categories = verity_user.get_categories()
+        accounts = verity_user.get_accounts()
         for category in categories:
             category.get_children()
     return render_template(
         "home.html",
         users=users,
         categories=categories,
+        accounts=accounts,
         selected_user_id=user_id,
         selected_user_name=selected_user_name,
     )
@@ -157,6 +161,50 @@ def submit_category():
         flash("Category not saved, please check the logs", "danger")
     else:
         flash("Category saved!", "success")
+    return redirect(url_for("home.home_page"))
+
+
+@home_bp.route("/submit_account", methods=["POST"])
+def submit_account():
+    user_id = session.get("user_id")
+    if not user_id:
+        flash("No user selected!", "danger")
+        return redirect(url_for("home.home_page"))
+
+    account_name = request.form.get("accountName")
+    account_type = request.form.get("accountType")
+    initial_balance = request.form.get("initialBalance", "0")
+
+    try:
+        balance = CurrencyBrain.convert_to_universal_currency(initial_balance)
+    except Exception:
+        balance = 0
+
+    database = Database(VerityConfig())
+
+    if account_type == "1":
+        new_account = currentAccount(database, account_name, 0, user_id)
+    elif account_type == "2":
+        new_account = cashAccount(database, account_name, 0, user_id)
+    elif account_type == "3":
+        new_account = savingAccount(database, account_name, 0, user_id)
+    elif account_type == "4":
+        new_account = creditAccount(database, account_name, 0, user_id)
+    elif account_type == "5":
+        new_account = untrackedAccount(database, account_name, 0, user_id)
+    else:
+        flash("Invalid account type", "danger")
+        return redirect(url_for("home.home_page"))
+
+    new_account.balance = balance
+    account_id = new_account.add()
+    logger.info(f"Account add returned id: {account_id}")
+
+    if account_id > 0:
+        flash("Account added successfully!", "success")
+    else:
+        flash("Failed to add account.", "danger")
+
     return redirect(url_for("home.home_page"))
 
 
