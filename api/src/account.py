@@ -17,6 +17,7 @@ class Account:
         self.user_id = user_id
         self.type = ""
         self.balance = 0
+        self.type_id = 0
         logger.info(f"Account {self.name} | {self.id} initialised")
 
     def __repr__(self):
@@ -37,7 +38,7 @@ class Account:
         if self.user_id == 0:
             logger.error("Account not attached to a user, cannot continue")
             return 0
-        if not self.type_id:
+        if self.type_id == 0:
             logger.error("Cannot add a non-typed account, please use Children of Account")
             return 0
         sql_statement = """
@@ -86,7 +87,7 @@ class savingAccount(Account):
 
     def __init__(self, database, name, id):
         self.type = "Saving"
-        self.type_id = 2
+        self.type_id = 3
         super(currentAccount, self).__init__(database, name, id)
 
 
@@ -95,7 +96,7 @@ class creditAccount(Account):
 
     def __init__(self, database, name, id):
         self.type = "Credit"
-        self.type_id = 3
+        self.type_id = 4
         super(currentAccount, self).__init__(database, name, id)
 
 
@@ -104,5 +105,5 @@ class untrackedAccount(Account):
 
     def __init__(self, database, name, id):
         self.type = "Untracked"
-        self.type_id = 4
+        self.type_id = 5
         super(currentAccount, self).__init__(database, name, id)
