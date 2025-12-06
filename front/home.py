@@ -4,12 +4,18 @@ import subprocess
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
+from api.src.account import (
+    cashAccount,
+    creditAccount,
+    currentAccount,
+    savingAccount,
+    untrackedAccount,
+)
 from api.src.category import Category
 from api.src.config import VerityConfig
 from api.src.currency_handler import CurrencyBrain
 from api.src.data_handler import Database
 from api.src.user import User
-from api.src.account import currentAccount, cashAccount, savingAccount, creditAccount, untrackedAccount
 
 logger = logging.getLogger(__name__)
 

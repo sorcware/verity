@@ -102,21 +102,16 @@ class Database:
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
             cursor.execute(sql)
-            
+
             # Check for missing columns in existing table
             cursor.execute(f"PRAGMA table_info({table_name})")
             existing_columns = [row[1] for row in cursor.fetchall()]
-            
+
             for column in table["table_columns"]:
                 col_name = column["column_name"]
                 if col_name not in existing_columns:
                     logger.info(f"Adding missing column {col_name} to table {table_name}")
-                    # Build column definition for ALTER TABLE
-                    # Note: SQLite ALTER TABLE ADD COLUMN has some restrictions (e.g. can't be PRIMARY KEY)
-                    # But for simple columns like 'balance' it works.
-                    # We need to reconstruct the type and constraints.
                     col_def = self._build_column(column)
-                    # _build_column returns "name type constraints", we just need "ADD COLUMN name type constraints"
                     alter_sql = f"ALTER TABLE {table_name} ADD COLUMN {col_def}"
                     try:
                         cursor.execute(alter_sql)

@@ -1,16 +1,16 @@
 import logging
 from typing import List
 
-from api.src.category import Category
-from api.src.data_handler import Database
 from api.src.account import (
     Account,
-    currentAccount,
     cashAccount,
-    savingAccount,
     creditAccount,
+    currentAccount,
+    savingAccount,
     untrackedAccount,
 )
+from api.src.category import Category
+from api.src.data_handler import Database
 
 logger = logging.getLogger(__name__)
 
