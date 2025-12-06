@@ -1,99 +1,155 @@
 {% extends "base.html" %}
-{% block title %} Home {% endblock %}
+{% block title %} Dashboard {% endblock %}
 {% block content %}
-<h1>Home of Verity</h1>
-<div>
-	<h2>link to user docs and user guide</h2>
-<button onclick="window.location.href='http://localhost:3000';">
-      		Docs and User Guide
-	</button>
-</div>
-<div>
-    <form action="{{url_for('home.submit_user_name')}}" method="POST">
-        <p>Create New User:</p>
-        <input
-            type="text"
-            id="userName"
-            name="userName"
-            placeholder="Enter User Name Here"
-            required
-        />
-        <input type="submit" value="Create User" />
-    </form>
+
+<div class="text-center mb-4">
+    <h1>Welcome to Verity</h1>
+    <p>Manage your finances with clarity and precision.</p>
+    <button class="button" onclick="window.location.href='http://localhost:3000';">
+        View Documentation
+    </button>
 </div>
 
-<div>
-    <form action="{{url_for('home.select_user')}}" method="POST">
-        <p>Select User:</p>
-        <select name="selectedUserId" onchange="this.form.submit()">
-            <option value="">-- Select a User --</option>
-            {% for user in users %}
-                {# If users is [(id, name)], use id as value and name as label #}
-                {% if user|length > 1 %}
-                    <option value="{{ user[0] }}" {% if selected_user_id == user[0] %}selected{% endif %}>{{ user[1] }} (ID: {{ user[0] }})</option>
-                {% else %}
-                    <option value="{{ user[0] }}" {% if selected_user_id == user[0] %}selected{% endif %}>{{ user[0] }}</option>
-                {% endif %}
-            {% endfor %}
-        </select>
-    </form>
+<div class="grid">
+    <!-- User Management -->
+    <div class="card">
+        <div class="card-header">
+            <h3>User Management</h3>
+        </div>
+        
+        <form action="{{url_for('home.submit_user_name')}}" method="POST" class="mb-4">
+            <label for="userName">Create New User</label>
+            <input
+                type="text"
+                id="userName"
+                name="userName"
+                placeholder="Enter User Name"
+                required
+            />
+            <input type="submit" value="Create User" />
+        </form>
+
+        <form action="{{url_for('home.select_user')}}" method="POST">
+            <label for="selectedUserId">Select User</label>
+            <select name="selectedUserId" id="selectedUserId" onchange="this.form.submit()">
+                <option value="">-- Select a User --</option>
+                {% for user in users %}
+                    {% if user|length > 1 %}
+                        <option value="{{ user[0] }}" {% if selected_user_id == user[0] %}selected{% endif %}>{{ user[1] }} (ID: {{ user[0] }})</option>
+                    {% else %}
+                        <option value="{{ user[0] }}" {% if selected_user_id == user[0] %}selected{% endif %}>{{ user[0] }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <!-- Asset Management -->
+    {% if selected_user_id %}
+    <div class="card">
+        <div class="card-header">
+            <h3>Add Assets</h3>
+        </div>
+
+        <form action="{{url_for('home.submit_account')}}" method="POST" class="mb-4">
+            <label>New Account</label>
+            <input type="text" name="accountName" placeholder="Account Name" required />
+            <div style="display: flex; gap: 1rem;">
+                <input type="number" step="0.01" name="initialBalance" placeholder="Initial Balance" style="flex: 1;" />
+                <select name="accountType" style="flex: 1;">
+                    <option value="1">Current Account</option>
+                    <option value="2">Cash Account</option>
+                    <option value="3">Saving Account</option>
+                    <option value="4">Credit Account</option>
+                    <option value="5">Untracked Account</option>
+                </select>
+            </div>
+            <input type="submit" value="Add Account" />
+        </form>
+
+        <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
+
+        <form action="{{url_for('home.submit_category')}}" method="POST">
+            <label>New Category</label>
+            <input type="text" name="categoryName" placeholder="Category Name" required />
+            <div style="display: flex; gap: 1rem;">
+                <input type="number" step="0.01" name="budgetValue" placeholder="Budget Value" style="flex: 1;" />
+                <select name="parentId" style="flex: 1;">
+                    <option value="0">No Parent (Top Category)</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="submit" value="Add Category" />
+        </form>
+    </div>
+    {% else %}
+    <div class="card" style="display: flex; align-items: center; justify-content: center; text-align: center;">
+        <div>
+            <h3>Get Started</h3>
+            <p>Select or create a user to begin managing accounts and categories.</p>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 {% if selected_user_id %}
-<!-- Account Form -->
-<div>
-    <form action="{{url_for('home.submit_account')}}" method="POST">
-        <p>New Account:</p>
-        <input type="text" name="accountName" placeholder="Enter Account Name Here" required />
-        <input type="number" step="0.01" name="initialBalance" placeholder="Initial Balance (optional)" />
-        <select name="accountType">
-            <option value="1">Current Account</option>
-            <option value="2">Cash Account</option>
-            <option value="3">Saving Account</option>
-            <option value="4">Credit Account</option>
-            <option value="5">Untracked Account</option>
-        </select>
-        <input type="submit" value="Add Account" />
-    </form>
-</div>
-<div>
-    <p><b>Your Accounts:</b><br></p>
-    <ul>
-        {% for account in accounts %}
-        <li>{{ account.name }} ({{ account.type }}) - Balance: {{ account.balance }}</li>
-        {% endfor %}
-    </ul>
-</div>
-<hr>
+<div class="grid mt-4">
+    <!-- Accounts List -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Your Accounts</h3>
+        </div>
+        {% if accounts %}
+            <ul>
+                {% for account in accounts %}
+                <li>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span><strong>{{ account.name }}</strong> <span style="color: var(--text-muted); font-size: 0.9em;">({{ account.type }})</span></span>
+                        <span style="color: var(--success-color);">{{ account.balance }}</span>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-center">No accounts found.</p>
+        {% endif %}
+    </div>
 
-<!-- Category Form -->
-<div>
-    <form action="{{url_for('home.submit_category')}}" method="POST">
-        <p>New Category:</p>
-        <input type="text" name="categoryName" placeholder="Enter Category Name Here" required />
-        <input type="number" step="0.01" name="budgetValue" placeholder="Budget Value (optional)" />
-        <select name="parentId">
-            <option value="0">No Parent (Top Category)</option>
-            {% for category in categories %}
-                <option value="{{ category.id }}">{{ category.name }}</option>
-            {% endfor %}
-        </select>
-        <input type="submit" value="Add Category" />
-    </form>
-</div>
-<div>
-    <p>
-<b>Your Categories:</b><br></p>
-<ul>{% for category in categories %}
-<li>{{ category.name }}   - Budget: {{ category.budget_value }}</li>
-{% if category.children|length > 0 %}<ul>{% for child in category.children %}
-<li> {{ child.name}}    - Budget: {{ child.budget_value }}</li>
-{% endfor %}</ul>{% endif %}
-{% endfor %}</ul>
-</div>
-{% else %}
-<div class="alert alert-warning" role="alert">
-    Please select a user before adding a category.
+    <!-- Categories List -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Your Categories</h3>
+        </div>
+        {% if categories %}
+            <ul>
+                {% for category in categories %}
+                <li>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span><strong>{{ category.name }}</strong></span>
+                        <span>{{ category.budget_value }}</span>
+                    </div>
+                    {% if category.children|length > 0 %}
+                        <ul style="margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid var(--border-color);">
+                            {% for child in category.children %}
+                            <li style="border-bottom: none; padding: 0.25rem 0;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>{{ child.name}}</span>
+                                    <span style="color: var(--text-muted);">{{ child.budget_value }}</span>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-center">No categories found.</p>
+        {% endif %}
+    </div>
 </div>
 {% endif %}
+
 {% endblock %}
